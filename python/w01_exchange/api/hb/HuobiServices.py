@@ -34,14 +34,15 @@ def get_kline(symbol, period, size=150):
 
 
 # 获取marketdepth
-def get_depth(symbol, type):
+def get_depth(symbol, type=None):
     """
     :param symbol
     :param type: 可选值：{ percent10, step0, step1, step2, step3, step4, step5 }
     :return:
     """
     params = {'symbol': symbol,
-              'type': type}
+              'type': 'percent10'
+              }
     
     url = MARKET_URL + '/market/depth'
     return http_get_request(url, params)
@@ -56,6 +57,16 @@ def get_trade(symbol):
     params = {'symbol': symbol}
 
     url = MARKET_URL + '/market/trade'
+    return http_get_request(url, params)
+
+# 获取trades
+def get_trades(symbol):
+    """
+    :param symbol
+    :return:
+    """
+    params = {'symbol': symbol,'size':1000}
+    url = MARKET_URL + '/market/history/trade'
     return http_get_request(url, params)
 
 
