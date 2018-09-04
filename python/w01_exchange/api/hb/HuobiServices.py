@@ -138,7 +138,7 @@ def get_balance(acct_id=None):
 # 下单
 
 # 创建并执行订单
-def send_order(amount, source, symbol, _type, price=0):
+def send_order(symbol, price , amount, _type, source='api'):
     """
     :param amount: 
     :param source: 如果使用借贷资产交易，请在下单接口,请求参数source中填写'margin-api'
@@ -203,9 +203,8 @@ def order_matchresults(order_id):
 
 
 # 查询当前委托、历史委托
-def orders_list(symbol, states, types=None, start_date=None, end_date=None, _from=None, direct=None, size=None):
+def orders_list(symbol, states='partial-filled,submitted', types=None, start_date=None, end_date=None, _from=None, direct=None, size=None):
     """
-    
     :param symbol: 
     :param states: 可选值 {pre-submitted 准备提交, submitted 已提交, partial-filled 部分成交, partial-canceled 部分成交撤销, filled 完全成交, canceled 已撤销}
     :param types: 可选值 {buy-market：市价买, sell-market：市价卖, buy-limit：限价买, sell-limit：限价卖}

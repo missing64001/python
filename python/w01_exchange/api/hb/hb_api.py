@@ -35,18 +35,18 @@ class Hb_api():
     def __init__(self):
         set_keys()
 
-    def kline(self,market,type,size=500):
-        data = get_kline(_symbol_t(market),type,size)
+    def kline(self,symbol,type,size=500):
+        data = get_kline(_symbol_t(symbol),type,size)
         return data['data']
 
-    def depth(self,market):
-        market = _symbol_t(market)
-        data = get_depth(market)
-        return data
+    def depth(self,symbol):
+        symbol = _symbol_t(symbol)
+        data = get_depth(symbol)
+        return (data['tick']['asks'],data['tick']['bids'])
 
-    def trades(self,market):
+    def trades(self,symbol):
         '''
-            {'ch': 'market.btcusdt.trade.detail',
+            {'ch': 'symbol.btcusdt.trade.detail',
              'data': [{'data': [{'amount': 0.24912410092209594,
                                  'direction': 'buy',
                                  'id': 1855406020311611152114,
@@ -72,16 +72,72 @@ class Hb_api():
              'status': 'ok',
              'ts': 1536030329105}v
         '''
-        market = _symbol_t(market)
-        data = get_trades(market)
+        symbol = _symbol_t(symbol)
+        data = get_trades(symbol)
         data = data['data']
+        res_datas = []
         for da in data:
-            length = (len(da['data']))
-            if length>1:
-                pprint(da)
-                print('\n\n')
-        print('------------ data need to analyse ------------')
-        return None
+            tid = da['id']
+            date = int(da['ts']/1000)
+            type = None
+            total = 0
+            amount = 0
+            for d in da['data']:
+                if not type:
+                    type = d['direction']
+                else:
+                    if type != d['direction']:
+                        raise ValueError(type + '___' + d['direction'])
+                total += d['price'] * d['amount']
+                amount += d['amount']
+            price = total / amount
+            res_datas.append({'tid':tid,'date':date,'type':type,'amount':amount,'price':price})
+        return res_datas
+
+
+    def order(self,symbol,price,amount,type):
+        '''
+            {'data': '11621969025', 'status': 'ok'}
+        '''
+        symbol = _symbol_t(symbol)
+        if type == 'sell':
+            type = 'sell-limit'
+        elif type == 'buy':
+            type = 'buy-limit'
+        data = send_order(symbol, price , amount, type)
+        return data
+
+    def getOrder(self,id):
+        '''
+            {'data': {'account-id': 4813361,
+                      'amount': '1.000000000000000000',
+                      'canceled-at': 0,
+                      'created-at': 1536043361830,
+                      'field-amount': '0.0',
+                      'field-cash-amount': '0.0',
+                      'field-fees': '0.0',
+                      'finished-at': 0,
+                      'id': 11621969025,
+                      'price': '1.000000000000000000',
+                      'source': 'api',
+                      'state': 'submitted',
+                      'symbol': 'btsusdt',
+                      'type': 'sell-limit'},
+             'status': 'ok'}
+        '''
+        data = order_info(id)
+        return data
+    def unfinished_orders_list(self,symbol):
+        symbol = _symbol_t(symbol)
+        data = orders_list(symbol)
+        return data
+
+    def cancelOrder(self,id):
+        '''
+            {'data': '11621969025', 'status': 'ok'}
+        '''
+        data = cancel_order(id)
+        return data
 
 if __name__ == '__main__':
     main()
