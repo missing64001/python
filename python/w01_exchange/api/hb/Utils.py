@@ -42,7 +42,7 @@ def http_get_request(url, params, add_to_headers=None):
     if add_to_headers:
         headers.update(add_to_headers)
     postdata = urllib.parse.urlencode(params)
-    response = requests.get(url, postdata, headers=headers, timeout=15) 
+    response = requests.get(url, postdata, headers=headers, timeout=10) 
     try:
         
         if response.status_code == 200:

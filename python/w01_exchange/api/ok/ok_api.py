@@ -86,6 +86,20 @@ class Ok_api:
         data = self.okcoinSpot.depth(symbol)
         return [data['asks'][::-1],data['bids']]
 
+
+    def balance(self):
+        data = self.okcoinSpot.userinfo()
+
+
+
+        data_free = data['info']['funds']['free']
+        data_freezed = data['info']['funds']['freezed']
+        data = filter( lambda x:data_free[x] != '0',data_free)
+        data_free = { da:data_free[da]     for da in data_free if data_free[da] != '0'}
+        data_freezed = { da:data_freezed[da] for da in data_freezed if data_freezed[da] != '0'}
+        return data_free,data_freezed
+
+        
     def order(self,symbol,price,amount,type):
         data = self.okcoinSpot.trade(symbol,price,amount,type)
         return data
@@ -106,9 +120,52 @@ class Ok_api:
         '''
         data = self.okcoinSpot.orderinfo(symbol,id)
         return data
-        
+
+
+
+
+
+
     def unfinished_orders_list(self,symbol):
+        '''{'currency_page': 1,
+             'orders': [{'amount': 1,
+                         'avg_price': 0,
+                         'create_date': 1536112711000,
+                         'deal_amount': 0,
+                         'order_id': 864345207,
+                         'orders_id': 864345207,
+                         'price': 10.0,
+                         'status': 0,
+                         'symbol': 'eos_usdt',
+                         'type': 'sell'}],
+             'page_length': 200,
+             'result': True,
+             'total': 1}
+
+
+
+             [{'amount': 1,
+               'avg_price': 0,
+               'create_date': 1536112711000,
+               'deal_amount': 0,
+               'deal_money': 0,
+               'order_id': 864345207,
+               'price': 10.0,
+               'type': 'sell'}]
+        '''
+        def deal_order_data(data,lst):
+            resl = []
+            for da in data:
+                d = {}
+                for l in lst:
+                    d[l] = da[l]
+                resl.append(d)
+            return resl
+
         data = self.okcoinSpot.orderHistory(symbol)
+        data = data['orders']
+        data = deal_order_data(data,['amount','price','deal_amount','avg_price','create_date','order_id','type'])
+        [da.update({'deal_money':da['deal_amount']*da['avg_price']}) for da in data]
         return data
 
 

@@ -12,7 +12,7 @@ from HuobiServices import *
 
 def main():
     
-    set_key()
+    set_keys()
     data = get_balance()
     data = data['data']['list']
     for da in data:
@@ -101,6 +101,15 @@ class Hb_api():
             res_datas.append((tid,symbol_b,date,price,amount,type))
         return res_datas
 
+    def balance(self):
+        data = get_balance()
+
+        data = data['data']['list']
+        data = filter( lambda x:x['balance'] != '0',data)
+        data = list(data)
+        data_free = { da['currency']:da['balance'] for da in data if da['type'] == 'trade'}
+        data_freezed = { da['currency']:da['balance'] for da in data if da['type'] == 'frozen'}
+        return data_free,data_freezed
 
     def order(self,symbol,price,amount,type):
         '''
@@ -138,6 +147,7 @@ class Hb_api():
     def unfinished_orders_list(self,symbol):
         symbol = _symbol_t(symbol)
         data = orders_list(symbol)
+        data = data['data']
         return data
 
     def cancelOrder(self,id,symbol=None):

@@ -242,21 +242,20 @@ class Zb_api:
     #         print(sys.stderr, 'zb query_account exception,',ex)
     #         return None
             
-    def getAccountInfo(self):
+    def balance(self):
         '''
             data = api.getAccountInfo()
         '''
-        try:
-            method = sys._getframe().f_code.co_name
-            params = "accesskey="+self.mykey+"&method="+method
-            obj = self.__api_call(method, params)
-            #print obj
-            return obj
-        except Exception as ex:
-            print(sys.stderr, 'zb %s exception ,'%method,ex)
-            return None
-    
+        method = 'getAccountInfo'
+        params = "accesskey="+self.mykey+"&method="+method
+        obj = self.__api_call(method, params)
 
+
+        obj = obj['result']['coins']
+        obj_free = { da['key']:da['available']         for da in obj if da['available'] != '0.00000000'}
+        obj_freezed = { da['key']:da['freez']         for da in obj if da['freez'] != '0.00000000'}
+
+        return obj_free ,obj_freezed
 
     def order(self,currency,price,amount,tradeType):
         '''
@@ -365,16 +364,33 @@ class Zb_api:
                 &sign=请求加密签名串&reqTime=当前时间毫秒数
             
             return
-                [{'currency': 'bts_usdt', 'type': 1, 'trade_money': '0.00000', 'price': 0.0538, 'status': 3, 'total_amount': 9.2, 
-                'fees': 0, 'id': '2018082368722076', 'trade_date': 1535008298044, 'trade_amount': 0.0}]
+                [{'currency': 'bts_usdt',
+                  'id': '2018090576873745',
+                  'price': 0.01,
+                  'status': 3,
+                  'total_amount': 0.5,
+                  'trade_amount': 0.0,
+                  'trade_date': 1536109600790,
+                  'trade_money': '0.00000',
+                  'type': 1}]
+
+
+                  [{'amount': 1,
+                    'avg_price': 0,
+                    'create_date': 1536112711000,
+                    'deal_amount': 0,
+                    'deal_money': 0,
+                    'order_id': 864345207,
+                    'price': 10.0,
+                    'type': 'sell'}]
         '''
         try:
             method = 'getUnfinishedOrdersIgnoreTradeType'
             params = "accesskey="+self.mykey+"&currency=%s&method=%s&pageIndex=%s&pageSize=10"% \
             (currency,method,pageIndex)
-            obj = self.__api_call(method, params)
-            #print obj
-            return obj
+            data = self.__api_call(method, params)
+            # for 
+            return data
         except Exception as ex:
             raise ex
             print(sys.stderr, 'zb %s exception ,'%method,ex)
