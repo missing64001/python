@@ -7,33 +7,48 @@ sys.path.insert(1,CURRENTURL)
 from api.hb.hb_api import Hb_api #02@ m1 bts_usdt
 from api.zb.zb_api import Zb_api
 from api.ok.ok_api import Ok_api
+LOCALS = locals()
 from pprint import pprint
-
+import traceback
+traceback.format_exc()
 
 
 def main():
-    api = Ok_api()
-    test(api)
-    exit()
-    api = Zb_api()
-    test(api)
-    api = Ok_api()
+    api = Trade('ok')
     test(api)
 
-# 11629784439
-# 11629565010
+def dec(fun):
+    def inn(*args,**kw):
+        try:
+            data = fun(*args,**kw)
+        except:
+            print('----------get a mistake----------')
+            print(fun,args,kw)
+            data = None
+        return data
+    return inn
+
+class Trade(object):
+    def __init__(self, exchange):
+        api = LOCALS[exchange.capitalize()+'_api']()
+        self.api = api
+        self.exchange = exchange
+    def __getattr__(self,name):
+        data = getattr(self.api,name)
+        data = dec(data)
+        return data
+
 def test(api):
-    # data = api.kline('btc_usdt','1day',5) #dohlcv
+    data = api.kline('btc_usdt','1day',5) #dohlcv
     # data = api.depth('btc_usdt')
     # data = api.trades('btc_usdt');data = (len(data),data[0])
     # data = api.balance()
-    # data = api.order('bts_usdt',1,1,'sell')
-    data = api.unfinished_orders_list('eos_usdt')
+    # data = api.order('bts_usdt',1,1,'sell') #price,amount
+    # data = api.unfinished_orders_list('bts_usdt')
     # data = api.getOrder(864345207,'eos_usdt')
     # data = api.cancelOrder('864345207','eos_usdt')
+    # data = [   api.cancelOrder(da['id'],'bts_usdt')   for da in data ]
     pprint(data)
-
-
 
 if __name__ == '__main__':
     main()

@@ -296,16 +296,14 @@ class Zb_api:
                 {'message': '挂单没有找到', 'code': 3001}
                 {'code': 1001, 'message': 'Error order id'}
         '''
-        try:
-            method = sys._getframe().f_code.co_name
-            params = "accesskey="+self.mykey+"&currency=%s&id=%s&method=%s"% \
-            (currency,id,method)
-            obj = self.__api_call(method, params)
-            print(obj)
-            return obj['code']
-        except Exception as ex:
-            print(sys.stderr, 'zb %s exception ,'%method,ex)
-            return None
+        method = sys._getframe().f_code.co_name
+        params = "accesskey="+self.mykey+"&currency=%s&id=%s&method=%s"% \
+        (currency,id,method)
+        obj = self.__api_call(method, params)
+        if obj.get('code') == 1000:
+            return True
+        print(obj)
+        return False
 
     def getOrders(self,currency,pageIndex,tradeType):
         '''
@@ -353,6 +351,23 @@ class Zb_api:
             print(sys.stderr, 'zb %s exception ,'%method,ex)
             return None
 
+    def deal_order_data(self,da):
+        if da['type'] == 1:
+            da['type'] = 'buy'
+        elif da['type'] == 0:
+            da['type'] = 'sell'
+
+
+        data = {
+            'amount':da['total_amount'],
+            'create_date':da['trade_date'],
+            'deal_amount':float(da['trade_amount']),
+            'deal_money':float(da['trade_money']),
+            'id':int(da['id']),
+            'price':float(da['price']),
+            'type':da['type'],
+            }
+        return data
 
     def unfinished_orders_list(self,currency,pageIndex=1):
         '''
@@ -384,17 +399,26 @@ class Zb_api:
                     'price': 10.0,
                     'type': 'sell'}]
         '''
-        try:
-            method = 'getUnfinishedOrdersIgnoreTradeType'
-            params = "accesskey="+self.mykey+"&currency=%s&method=%s&pageIndex=%s&pageSize=10"% \
-            (currency,method,pageIndex)
-            data = self.__api_call(method, params)
-            # for 
-            return data
-        except Exception as ex:
-            raise ex
-            print(sys.stderr, 'zb %s exception ,'%method,ex)
-            return None
+
+        method = 'getUnfinishedOrdersIgnoreTradeType'
+        params = "accesskey="+self.mykey+"&currency=%s&method=%s&pageIndex=%s&pageSize=10"% \
+        (currency,method,pageIndex)
+        data = self.__api_call(method, params)
+        if type(data) == dict and data.get('code') == 3001:
+            return []
+        res_datas = []
+        for da in data:
+            if da['type'] == 1:
+                da['type'] = 'buy'
+            elif da['type'] == 0:
+                da['type'] = 'sell'
+
+
+            res_datas.append(self.deal_order_data(da))
+
+
+        return res_datas
+
 
     def getOrder(self,id,currency):
         '''
@@ -404,15 +428,12 @@ class Zb_api:
                 {'status': 3, 'trade_money': '0.00000', 'total_amount': 9.2, 'price': 0.0538, 'currency': 'bts_usdt', 
                 'type': 1, 'id': '2018082368722076', 'trade_amount': 0.0, 'trade_date': 1535008298044}
         '''
-        try:
-            method = sys._getframe().f_code.co_name
-            params = "accesskey="+self.mykey+"&currency=%s&id=%s&method=%s"% (currency,id,method)
-            obj = self.__api_call(method, params)
-            #print obj
-            return obj
-        except Exception as ex:
-            print(sys.stderr, 'zb %s exception ,'%method,ex)
-            return None
+
+        method = sys._getframe().f_code.co_name
+        params = "accesskey="+self.mykey+"&currency=%s&id=%s&method=%s"% (currency,id,method)
+        da = self.__api_call(method, params)
+        da = self.deal_order_data(da)
+        return da
 
 
     def getUserAddress(self,currency):

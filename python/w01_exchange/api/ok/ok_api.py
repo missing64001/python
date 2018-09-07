@@ -104,6 +104,18 @@ class Ok_api:
         data = self.okcoinSpot.trade(symbol,price,amount,type)
         return data
 
+    def deal_order_data(self,data,lst):
+        resl = []
+        for da in data:
+            d = {}
+            for l in lst:
+                if l == 'order_id':
+                    d['id'] = da[l]
+                else:
+                    d[l] = da[l]
+            resl.append(d)
+        return resl
+
     def getOrder(self,id,symbol=None):
         '''
             {'orders': [{'amount': 1,
@@ -119,7 +131,15 @@ class Ok_api:
              'result': True}
         '''
         data = self.okcoinSpot.orderinfo(symbol,id)
-        return data
+
+
+
+        data = data['orders']
+        data = self.deal_order_data(data,['amount','price','deal_amount','avg_price','create_date','order_id','type'])
+        [da.update({'deal_money':da['deal_amount']*da['avg_price']}) for da in data]
+        if len(data) > 1:
+            raise ValueError(data)
+        return data[0]
 
 
 
@@ -153,18 +173,13 @@ class Ok_api:
                'price': 10.0,
                'type': 'sell'}]
         '''
-        def deal_order_data(data,lst):
-            resl = []
-            for da in data:
-                d = {}
-                for l in lst:
-                    d[l] = da[l]
-                resl.append(d)
-            return resl
+
 
         data = self.okcoinSpot.orderHistory(symbol)
+        if not data.get('orders'):
+            return data
         data = data['orders']
-        data = deal_order_data(data,['amount','price','deal_amount','avg_price','create_date','order_id','type'])
+        data = self.deal_order_data(data,['amount','price','deal_amount','avg_price','create_date','order_id','type'])
         [da.update({'deal_money':da['deal_amount']*da['avg_price']}) for da in data]
         return data
 
@@ -184,7 +199,10 @@ class Ok_api:
              'result': True}
         '''
         data = self.okcoinSpot.ordersinfo(symbol,id)
-        return data
+        if data.get('result') == True:
+            return True
+        print(data)
+        return False
     # 
     # 
 if __name__ == '__main__':

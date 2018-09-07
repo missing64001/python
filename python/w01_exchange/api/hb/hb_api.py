@@ -142,23 +142,55 @@ class Hb_api():
                       'type': 'sell-limit'},
              'status': 'ok'}
         '''
-        data = order_info(id)
-        return data
+        da = order_info(id)
+        da = da['data']
+
+        
+        da = self.deal_order_data(da)
+
+
+
+        return da
+
+
     def unfinished_orders_list(self,symbol):
         symbol = _symbol_t(symbol)
         data = orders_list(symbol)
         data = data['data']
-        return data
 
+
+
+
+        res_datas = []
+        for da in data:
+            res_datas.append(self.deal_order_data(da))
+        return res_datas
+
+    def deal_order_data(self,da):
+        if da['type'].startswith('buy'):
+            da['type'] = 'buy'
+        elif da['type'].startswith('sell'):
+            da['type'] = 'sell'
+        data = {
+        'amount':float(da['amount']),
+        'create_date':da['created-at'],
+        'deal_amount':float(da['field-amount']),
+        'fees':float(da['field-fees']),
+        'deal_money':float(da['field-cash-amount']),
+        'id':int(da['id']),
+        'price':float(da['price']),
+        'type':da['type'],
+        }
+        return data
     def cancelOrder(self,id,symbol=None):
         '''
             {'data': '11621969025', 'status': 'ok'}
         '''
         data = cancel_order(id)
+        if str(id) == str(data.get('data',0)):
+            return True
         print(data)
-        if str(id) == str(data['data']):
-            return 1000
-        return 3001
+        return False
 
 if __name__ == '__main__':
     main()
