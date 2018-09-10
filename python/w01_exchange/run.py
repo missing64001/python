@@ -13,8 +13,6 @@ from api.ok.ok_api import Ok_api
 LOCALS = locals()
 from pprint import pprint
 
-
-
 def main():
     api = Trade('ok')
     test(api)
