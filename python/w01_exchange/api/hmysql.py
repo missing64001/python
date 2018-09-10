@@ -1,6 +1,5 @@
 import sys 
 import os
-import os
 sys.path.insert(1,os.path.abspath(os.path.dirname(__file__)+'\\..'))
 from __init__ import Mysql
 
@@ -9,14 +8,29 @@ import time,datetime
 
 def main():
 
+
     global MYSQL
     global EXCHANGE
     EXCHANGE = 'ok'
     MYSQL = Mysql('localhost','w01_exchange','w01_exchange',db='w01_exchange')
-
-
-
     # trades: exchange symbol id date,price,amount,famount,type,fee,fee_symbol,isapi
+
+
+    dic = {
+        'exchange':'ok',
+        'symbol':'btc_usdt',
+        'id':3333,
+        'date':1111111,
+        'price':12424.345,
+        'amount':324.34,
+        'type':'sell',
+    }
+    save_order_info(dic)
+    return 
+
+
+
+
 
     trades_sql_s="""
     -- drop table if exists trades;
@@ -29,6 +43,7 @@ def main():
     price_p tinyint not null,
     amount int not null,
     amount_p tinyint not null,
+    type tinyint not null, -- 1 buy 2 sell
 
 
     famount int default 0,
@@ -36,14 +51,15 @@ def main():
     fee int default 0,
     fee_p tinyint default 0,
     fee_symbol varchar(10) default null,
-    type tinyint not null, -- 1 buy 2 sell
-    isapi tinyint default 1
+    isapi tinyint default 1,
+    isfinished tinyint default 0
     );
     ALTER TABLE trades
     ADD UNIQUE KEY(exchange,symbol,id);
     """
 
     # charge_and_withdraw: exchange symbol id date amount 
+
     charge_and_withdraw_sql_s="""
     -- drop table if exists charge_and_withdraw;
     create table if not exists charge_and_withdraw(
@@ -62,6 +78,69 @@ def main():
     mysql_exec_sqls = [trades_sql_s,charge_and_withdraw_sql_s]
     for sql_s in mysql_exec_sqls:
         MYSQL.exec(sql_s)
+TYPE_T = {
+    'buy':1,1:'buy',
+    'sell':2,2:'sell'
+}
+
+EXCHANGE_T = {
+    'ok':1,1:'ok',
+    'zb':2,2:'zb',
+    'hb':3,3:'hb',
+}
+
+
+
+
+def save_order_info(dic):  
+    # exchange  symbol  id  date  price  price_p  amount  amount_p  type
+    dic['price'],dic['price_p'] = split_precision(dic['price'])
+    dic['amount'],dic['amount_p'] = split_precision(dic['amount'])
+    dic['exchange'] = EXCHANGE_T[dic['exchange']]
+    dic['type'] = TYPE_T[dic['type']]
+
+    fields = []
+    values = []
+    [fields.append(f) or values.append(dic[f])  for f in dic]
+    fields = str(tuple(fields)).replace("'",' ')
+    values = str(tuple(values))
+
+    print(fields,values)
+    sql_s = 'INSERT INTO trades%s values%s' % (fields,values)
+
+    try:
+        MYSQL.exec(sql_s)
+    except Exception as e:
+        if 'Duplicate' in str(e):
+            print(exchange,symbol,id,'Duplicate')
+        else:
+            raise e
+
+
+def split_precision(f):
+    f = str(f)
+    if 'e' in f:
+        flst=f.split('e-')
+        f = flst[0]
+        extra_precision = int(flst[1])
+    else:
+        extra_precision = 0
+
+    flst = f.split('.')
+    if len(flst)==1:
+        precision = 0
+    else:
+        precision = len(flst[1])
+    amount = ''.join(flst).lstrip('0')
+    if len(amount) - 8 >0:
+        extra_precision -= len(amount) - 8
+
+    length_zero = len(amount)-len(amount.lstrip('0'))
+    amount = amount[:8+length_zero]
+    return int(amount),-(precision+extra_precision+length_zero)
+
+def join_precision(amount,precision):
+    return amount * 10 ** (precision)
 
 
 if __name__ == '__main__':
