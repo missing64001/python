@@ -1,9 +1,11 @@
 
-import os
-CURRENTURL = os.path.dirname(__file__)
-import sys
-print(os.path.abspath(''))
-exit(0)
+# import os
+# CURRENTURL = os.path.dirname(__file__)
+# import sys
+# print(os.path.abspath(''))
+# exit(0)
+
+
 from __init__ import deal_e
 from api.hb.hb_api import Hb_api #02@ m1 bts_usdt
 from api.zb.zb_api import Zb_api
@@ -16,6 +18,11 @@ from pprint import pprint
 def main():
     api = Trade('ok')
     test(api)
+    try:
+        0 / 0
+    except Exception:
+        deal_e()
+
 
 def dec(fun):
     def inn(*args,**kw):
@@ -38,7 +45,7 @@ class Trade(object):
         return data
 
 def test(api):
-    data = api.kline('btc_usdt','1day',5) #dohlcv
+    # data = api.kline('btc_usdt','1day',5) #dohlcv
     # data = api.depth('btc_usdt')
     # data = api.trades('btc_usdt');data = (len(data),data[0])
     # data = api.balance()
