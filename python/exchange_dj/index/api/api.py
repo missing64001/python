@@ -1,8 +1,8 @@
 from pprint import pprint
 import sys 
 import os
-sys.path.insert(1,os.path.abspath(os.path.dirname(__file__)+'\\..'))
-
+# sys.path.insert(1,os.path.abspath(os.path.dirname(__file__)+'\\..'))
+from .import_myfn import deal_e
 
 
 
@@ -17,6 +17,8 @@ path = CURRENTURL
 paths = {d:CURRENTURL+'/'+d for d in os.listdir(CURRENTURL) 
             if os.path.isdir(CURRENTURL+'/'+d) and d != '__pycache__'}
 for exchange in paths:
+    if exchange == 'err':
+        continue
 
     # pprint(sys.path)
     sys.path.insert(1,CURRENTURL)

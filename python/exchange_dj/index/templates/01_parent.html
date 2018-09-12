@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% block title %}
+            01-parent
+        {% endblock %}
+    </title>
+</head>
+<body>
+    <h1>这是　01_parent页面</h1>
+    {% block content %}
+        <h1>这是可以被更改的内容</h1>
+    {% endblock %}
+    <h1>这是网页的底部信息</h1>
+    {% block bottom %}
+    {% endblock %}
+
+</body>
+</html>

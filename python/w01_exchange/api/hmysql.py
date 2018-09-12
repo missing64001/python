@@ -1,7 +1,7 @@
 import sys 
 import os
-sys.path.insert(1,os.path.abspath(os.path.dirname(__file__)+'\\..'))
-from __init__ import Mysql
+# sys.path.insert(1,os.path.abspath(os.path.dirname(__file__)+'\\..'))
+# from __init__ import Mysql
 
 from pprint import pprint
 import time,datetime

@@ -1,0 +1,60 @@
+Traceback (most recent call last):
+  File "C:\Users\vanlance\AppData\Local\Programs\Python\Python35\lib\site-packages\urllib3\connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "C:\Users\vanlance\AppData\Local\Programs\Python\Python35\lib\site-packages\urllib3\connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "C:\Users\vanlance\AppData\Local\Programs\Python\Python35\lib\site-packages\urllib3\connection.py", line 356, in connect
+    ssl_context=context)
+  File "C:\Users\vanlance\AppData\Local\Programs\Python\Python35\lib\site-packages\urllib3\util\ssl_.py", line 359, in ssl_wrap_socket
+    return context.wrap_socket(sock, server_hostname=server_hostname)
+  File "C:\Users\vanlance\AppData\Local\Programs\Python\Python35\lib\ssl.py", line 377, in wrap_socket
+    _context=self)
+  File "C:\Users\vanlance\AppData\Local\Programs\Python\Python35\lib\ssl.py", line 752, in __init__
+    self.do_handshake()
+  File "C:\Users\vanlance\AppData\Local\Programs\Python\Python35\lib\ssl.py", line 988, in do_handshake
+    self._sslobj.do_handshake()
+  File "C:\Users\vanlance\AppData\Local\Programs\Python\Python35\lib\ssl.py", line 633, in do_handshake
+    self._sslobj.do_handshake()
+socket.timeout: _ssl.c:629: The handshake operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\vanlance\AppData\Local\Programs\Python\Python35\lib\site-packages\requests\adapters.py", line 445, in send
+    timeout=timeout
+  File "C:\Users\vanlance\AppData\Local\Programs\Python\Python35\lib\site-packages\urllib3\connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "C:\Users\vanlance\AppData\Local\Programs\Python\Python35\lib\site-packages\urllib3\util\retry.py", line 367, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "C:\Users\vanlance\AppData\Local\Programs\Python\Python35\lib\site-packages\urllib3\packages\six.py", line 686, in reraise
+    raise value
+  File "C:\Users\vanlance\AppData\Local\Programs\Python\Python35\lib\site-packages\urllib3\connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "C:\Users\vanlance\AppData\Local\Programs\Python\Python35\lib\site-packages\urllib3\connectionpool.py", line 346, in _make_request
+    self._raise_timeout(err=e, url=url, timeout_value=conn.timeout)
+  File "C:\Users\vanlance\AppData\Local\Programs\Python\Python35\lib\site-packages\urllib3\connectionpool.py", line 306, in _raise_timeout
+    raise ReadTimeoutError(self, url, "Read timed out. (read timeout=%s)" % timeout_value)
+urllib3.exceptions.ReadTimeoutError: HTTPSConnectionPool(host='api.huobi.br.com', port=443): Read timed out. (read timeout=10)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "F:\mygit\python\exchange_dj\index\api\api.py", line 41, in inn
+    data = fun(*args,**kw)
+  File "F:\mygit\python\exchange_dj\index\api\hb\hb_api.py", line 49, in depth
+    data = get_depth(symbol)
+  File "F:\mygit\python\exchange_dj\index\api\hb\HuobiServices.py", line 48, in get_depth
+    return http_get_request(url, params)
+  File "F:\mygit\python\exchange_dj\index\api\hb\Utils.py", line 45, in http_get_request
+    response = requests.get(url, postdata, headers=headers, timeout=10)
+  File "C:\Users\vanlance\AppData\Local\Programs\Python\Python35\lib\site-packages\requests\api.py", line 72, in get
+    return request('get', url, params=params, **kwargs)
+  File "C:\Users\vanlance\AppData\Local\Programs\Python\Python35\lib\site-packages\requests\api.py", line 58, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "C:\Users\vanlance\AppData\Local\Programs\Python\Python35\lib\site-packages\requests\sessions.py", line 512, in request
+    resp = self.send(prep, **send_kwargs)
+  File "C:\Users\vanlance\AppData\Local\Programs\Python\Python35\lib\site-packages\requests\sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "C:\Users\vanlance\AppData\Local\Programs\Python\Python35\lib\site-packages\requests\adapters.py", line 526, in send
+    raise ReadTimeout(e, request=request)
+requests.exceptions.ReadTimeout: HTTPSConnectionPool(host='api.huobi.br.com', port=443): Read timed out. (read timeout=10)
