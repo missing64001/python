@@ -35,15 +35,19 @@ class Ok_api:
         headers = {
         'user-agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.75 Safari/537.36 Maxthon/5.1.3.2000',
         }
-        try:
-            url = 'https://www.okb.com/api/v1/' + path + params
-            req = urllib.request.Request(url,headers=headers)
-            res = urllib.request.urlopen(req, timeout=10)
-            doc = json.loads(res.read().decode('utf-8')) # .decode('gbk', 'ignore')
-            return doc
-        except Exception as ex:
-            print(sys.stderr, 'ok request public_ex: ', ex)
-            return None
+
+        url = 'https://www.okb.com/api/v1/' + path + params
+        req = urllib.request.Request(url,headers=headers)
+        res = urllib.request.urlopen(req, timeout=10)
+        doc = json.loads(res.read().decode('utf-8')) # .decode('gbk', 'ignore')
+        return doc
+
+
+        # try:
+
+        # except Exception as ex:
+        #     print(sys.stderr, 'ok request public_ex: ', ex)
+        #     return None
 
             
 
@@ -52,16 +56,18 @@ class Ok_api:
     def trades(self,symbol='btc_usdt',since=0):
         '''
             return (tid,symbol,date,price,amount,type)
+            max_len 60
         '''
+        data = self.okcoinSpot.trades(symbol,since)
+        lst = [da['tid'] for da in data]
+        return [(da['tid'],symbol,da['date'],da['price'],da['amount'],da['type']) for da in data[::-1]]
 
-        try:
-            data = self.okcoinSpot.trades(symbol,since)
-            lst = [da['tid'] for da in data]
-            return [(da['tid'],symbol,da['date'],da['price'],da['amount'],da['type']) for da in data]
-        except Exception as e:
-            # raise e
-            print('ok_api_ trades' ,e)
-            return []
+        # try:
+            
+        # except Exception as e:
+        #     # raise e
+        #     print('ok_api_ trades' ,e)
+        #     return []
 
     def kline(self,symbol,type,size=500):
         '''
@@ -72,19 +78,22 @@ class Ok_api:
 
             https://www.okb.com/api/v1/kline.do
         '''
-        try:
-            path = 'kline.do?'
-            params = "symbol=%s&type=%s&size=%s" %(symbol,type,size)
-            obj = self.__api_public_call(path, params)
-            # print (obj)
-            return obj
-        except Exception as ex:
-            print(sys.stderr, 'ok %s exception ,'%path,ex)
-            return None
+        path = 'kline.do?'
+        params = "symbol=%s&type=%s&size=%s" %(symbol,type,size)
+        obj = self.__api_public_call(path, params)
+
+        return obj
+
+        # try:
+
+        # except Exception as ex:
+        #     print(sys.stderr, 'ok %s exception ,'%path,ex)
+        #     return None
 
     def depth(self,symbol = ''):
         data = self.okcoinSpot.depth(symbol)
-        return [data['asks'][::-1],data['bids']]
+        data =[data['asks'][::-1],data['bids']]
+        return data
 
 
     def balance(self):

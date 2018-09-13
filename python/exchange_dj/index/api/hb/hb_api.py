@@ -51,6 +51,7 @@ class Hb_api():
 
     def trades(self,symbol):
         '''
+        max_len :1000
             {'ch': 'symbol.btcusdt.trade.detail',
              'data': [{'data': [{'amount': 0.24912410092209594,
                                  'direction': 'buy',

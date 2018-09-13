@@ -43,15 +43,21 @@ def http_get_request(url, params, add_to_headers=None):
         headers.update(add_to_headers)
     postdata = urllib.parse.urlencode(params)
     response = requests.get(url, postdata, headers=headers, timeout=10) 
-    try:
-        
-        if response.status_code == 200:
-            return response.json()
-        else:
-            return
-    except BaseException as e:
-        print("httpGet failed, detail is:%s,%s" %(response.text,e))
+    if response.status_code == 200:
+        return response.json()
+    else:
         return
+
+
+    # try:
+        
+    #     if response.status_code == 200:
+    #         return response.json()
+    #     else:
+    #         return
+    # except BaseException as e:
+    #     print("httpGet failed, detail is:%s,%s" %(response.text,e))
+    #     return
 
 
 def http_post_request(url, params, add_to_headers=None):
@@ -63,15 +69,17 @@ def http_post_request(url, params, add_to_headers=None):
         headers.update(add_to_headers)
     postdata = json.dumps(params)
     response = requests.post(url, postdata, headers=headers, timeout=10)
-    try:
-        
-        if response.status_code == 200:
-            return response.json()
-        else:
-            return
-    except BaseException as e:
-        print("httpPost failed, detail is:%s,%s" %(response.text,e))
+    if response.status_code == 200:
+        return response.json()
+    else:
         return
+
+    # try:
+        
+
+    # except BaseException as e:
+    #     print("httpPost failed, detail is:%s,%s" %(response.text,e))
+    #     return
 
 
 def api_key_get(params, request_path):

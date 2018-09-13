@@ -3,7 +3,8 @@ import sys
 import os
 # sys.path.insert(1,os.path.abspath(os.path.dirname(__file__)+'\\..'))
 from .import_myfn import deal_e
-
+from socket import timeout
+from requests.exceptions import ReadTimeout,ConnectionError,ConnectTimeout
 
 
 
@@ -14,9 +15,9 @@ CURRENTURL = os.path.dirname(__file__)
 
 APIS = {}
 path = CURRENTURL
-paths = {d:CURRENTURL+'/'+d for d in os.listdir(CURRENTURL) 
+exchanges = {d:CURRENTURL+'/'+d for d in os.listdir(CURRENTURL) 
             if os.path.isdir(CURRENTURL+'/'+d) and d != '__pycache__'}
-for exchange in paths:
+for exchange in exchanges:
     if exchange == 'err':
         continue
 
@@ -28,9 +29,14 @@ for exchange in paths:
     APIS[exchange] = getattr(APIS[exchange],(exchange+'_api').capitalize())
 
 
+exchanges.pop('err')
+EXCHANGES = set(exchanges)
+
+
 def main():
     api = Trade('hb')
-    test(api)
+    # test(api)
+    # 
     # try:
     #     0 / 0
     # except Exception:
@@ -41,6 +47,12 @@ def dec(fun):
     def inn(*args,**kw):
         try:
             data = fun(*args,**kw)
+        except (timeout,ReadTimeout,ConnectionError,ConnectTimeout):
+            print('time out')
+            data = None
+        except (TypeError,KeyError):
+            print('none data')
+            data = None
         except Exception:
             deal_e()
             data = None

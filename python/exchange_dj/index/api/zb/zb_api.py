@@ -59,31 +59,33 @@ class Zb_api:
         return dg
 
     def __api_call(self, path, params = ''):
-        try:
-            SHA_secret = self.__digest(self.mysecret)
-            sign = self.__hmacSign(params, SHA_secret)
-            self.jm = sign
-            reqTime = (int)(time.time()*1000)
-            params += '&sign=%s&reqTime=%d'%(sign, reqTime)
-            url = 'https://trade.zb.cn/api/' + path + '?' + params
-            req = urllib.request.Request(url)
-            res = urllib.request.urlopen(req, timeout=10)
-            doc = json.loads(res.read().decode('utf-8')) # .decode('gbk', 'ignore')
-            return doc
-        except Exception as ex:
-            print(sys.stderr, 'zb request ex: ', ex)
-            return None
+        SHA_secret = self.__digest(self.mysecret)
+        sign = self.__hmacSign(params, SHA_secret)
+        self.jm = sign
+        reqTime = (int)(time.time()*1000)
+        params += '&sign=%s&reqTime=%d'%(sign, reqTime)
+        url = 'https://trade.zb.cn/api/' + path + '?' + params
+        req = urllib.request.Request(url)
+        res = urllib.request.urlopen(req, timeout=10)
+        doc = json.loads(res.read().decode('utf-8')) # .decode('gbk', 'ignore')
+        return doc
+        # try:
+
+        # except Exception as ex:
+        #     print(sys.stderr, 'zb request ex: ', ex)
+        #     return None
 
     def __api_public_call(self,path,params=''):
-        try:
-            url = 'http://api.zb.cn/data/v1/' + path + '?' + params
-            req = urllib.request.Request(url)
-            res = urllib.request.urlopen(req, timeout=10)
-            doc = json.loads(res.read().decode('utf-8')) # .decode('gbk', 'ignore')
-            return doc
-        except Exception as ex:
-            print(sys.stderr, 'zb request public_ex: ', ex)
-            return None
+        url = 'http://api.zb.cn/data/v1/' + path + '?' + params
+        req = urllib.request.Request(url)
+        res = urllib.request.urlopen(req, timeout=10)
+        doc = json.loads(res.read().decode('utf-8')) # .decode('gbk', 'ignore')
+        return doc
+        # try:
+
+        # except Exception as ex:
+        #     print(sys.stderr, 'zb request public_ex: ', ex)
+        #     return None
 
     def ticker(self,market):
         '''
@@ -134,12 +136,12 @@ class Zb_api:
         method = sys._getframe().f_code.co_name
         params = "market=%s&since=%s"%(market,since)
         data = self.__api_public_call(method, params)
-        if data is None:
-            print('trades 未接收到数据')
-            time.sleep(20)
-            return self.trades(market,since)
-        else:
-            return [(da['tid'],market,da['date'],da['price'],da['amount'],da['type']) for da in data]
+        # if data is None:
+        #     print('trades 未接收到数据')
+        #     time.sleep(20)
+        #     return self.trades(market,since)
+        # else:
+        return [(da['tid'],market,da['date'],float(da['price']),float(da['amount']),da['type']) for da in data[::-1]]
 
 
     def depth(self,market):
@@ -272,16 +274,18 @@ class Zb_api:
             tradeType = 1
         elif tradeType == 'sell':
             tradeType = 0
-        try:
-            method = sys._getframe().f_code.co_name
-            params = "accesskey="+self.mykey+"&amount=%s&currency=%s&method=%s&price=%s&tradeType=%s"% \
-            (amount,currency,method,price,tradeType)
-            obj = self.__api_call(method, params)
-            obj = obj['id']
-            return obj
-        except Exception as ex:
-            print(sys.stderr, 'zb %s exception ,'%method,ex)
-            return None
+
+        method = sys._getframe().f_code.co_name
+        params = "accesskey="+self.mykey+"&amount=%s&currency=%s&method=%s&price=%s&tradeType=%s"% \
+        (amount,currency,method,price,tradeType)
+        obj = self.__api_call(method, params)
+        obj = obj['id']
+        return obj
+        # try:
+
+        # except Exception as ex:
+        #     print(sys.stderr, 'zb %s exception ,'%method,ex)
+        #     return None
 
     def cancelOrder(self,id,currency):
         '''
@@ -315,16 +319,18 @@ class Zb_api:
                 [{'currency': 'bts_usdt', 'type': 1, 'trade_money': '0.00000', 'price': 0.0538, 'status': 3, 'total_amount': 9.2, 
                 'fees': 0, 'id': '2018082368722076', 'trade_date': 1535008298044, 'trade_amount': 0.0}]
         '''
-        try:
-            method = sys._getframe().f_code.co_name
-            params = "accesskey="+self.mykey+"&currency=%s&method=%s&pageIndex=%s&tradeType=%s"% \
-            (currency,method,pageIndex,tradeType)
-            obj = self.__api_call(method, params)
-            #print obj
-            return obj
-        except Exception as ex:
-            print(sys.stderr, 'zb %s exception ,'%method,ex)
-            return None
+
+        method = sys._getframe().f_code.co_name
+        params = "accesskey="+self.mykey+"&currency=%s&method=%s&pageIndex=%s&tradeType=%s"% \
+        (currency,method,pageIndex,tradeType)
+        obj = self.__api_call(method, params)
+        #print obj
+        return obj
+        # try:
+
+        # except Exception as ex:
+        #     print(sys.stderr, 'zb %s exception ,'%method,ex)
+        #     return None
 
 
     def getOrdersNew(self,currency,pageIndex,tradeType):
@@ -340,16 +346,17 @@ class Zb_api:
                 [{'currency': 'bts_usdt', 'type': 1, 'trade_money': '0.00000', 'price': 0.0538, 'status': 3, 'total_amount': 9.2, 
                 'fees': 0, 'id': '2018082368722076', 'trade_date': 1535008298044, 'trade_amount': 0.0}]
         '''
-        try:
-            method = sys._getframe().f_code.co_name
-            params = "accesskey="+self.mykey+"&currency=%s&method=%s&pageIndex=%s&pageSize=100&tradeType=%s"% \
-            (currency,method,pageIndex,tradeType)
-            obj = self.__api_call(method, params)
-            #print obj
-            return obj
-        except Exception as ex:
-            print(sys.stderr, 'zb %s exception ,'%method,ex)
-            return None
+        method = sys._getframe().f_code.co_name
+        params = "accesskey="+self.mykey+"&currency=%s&method=%s&pageIndex=%s&pageSize=100&tradeType=%s"% \
+        (currency,method,pageIndex,tradeType)
+        obj = self.__api_call(method, params)
+        #print obj
+        return obj
+        # try:
+
+        # except Exception as ex:
+        #     print(sys.stderr, 'zb %s exception ,'%method,ex)
+        #     return None
 
     def deal_order_data(self,da):
         if da['type'] == 1:
@@ -448,15 +455,16 @@ class Zb_api:
             return
                 {'message': {'des': 'success', 'isSuc': True, 'datas': {'key': 'zbbts001_741580511583015302'}}, 'code': 1000}
         '''
-        try:
-            method = sys._getframe().f_code.co_name
-            params = "accesskey="+self.mykey+"&currency=%s&method=%s"% (currency,method)
-            obj = self.__api_call(method, params)
-            #print obj
-            return obj
-        except Exception as ex:
-            print(sys.stderr, 'zb %s exception ,'%method,ex)
-            return None
+        method = sys._getframe().f_code.co_name
+        params = "accesskey="+self.mykey+"&currency=%s&method=%s"% (currency,method)
+        obj = self.__api_call(method, params)
+        #print obj
+        return obj
+        # try:
+
+        # except Exception as ex:
+        #     print(sys.stderr, 'zb %s exception ,'%method,ex)
+        #     return None
 
 
     def getWithdrawAddress(self,currency):
@@ -471,15 +479,16 @@ class Zb_api:
             return
                 {'message': {'des': 'success', 'isSuc': True, 'datas': {'key': 'zbbts001_741580511583015302'}}, 'code': 1000}
         '''
-        try:
-            method = sys._getframe().f_code.co_name
-            params = "accesskey="+self.mykey+"&currency=%s&method=%s"% (currency,method)
-            obj = self.__api_call(method, params)
-            #print obj
-            return obj
-        except Exception as ex:
-            print(sys.stderr, 'zb %s exception ,'%method,ex)
-            return None
+        method = sys._getframe().f_code.co_name
+        params = "accesskey="+self.mykey+"&currency=%s&method=%s"% (currency,method)
+        obj = self.__api_call(method, params)
+        #print obj
+        return obj
+        # try:
+
+        # except Exception as ex:
+        #     print(sys.stderr, 'zb %s exception ,'%method,ex)
+        #     return None
 
 
 
@@ -508,16 +517,17 @@ class Zb_api:
                              'des': 'success',
                              'isSuc': True}}
         '''
-        try:
-            method = sys._getframe().f_code.co_name
-            params = "accesskey="+self.mykey+"&currency=%s&method=%s&pageIndex=%s&pageSize=10"% \
-            (currency,method,pageIndex)
-            obj = self.__api_call(method, params)
-            #print obj
-            return obj
-        except Exception as ex:
-            print(sys.stderr, 'zb %s exception ,'%method,ex)
-            return None
+        method = sys._getframe().f_code.co_name
+        params = "accesskey="+self.mykey+"&currency=%s&method=%s&pageIndex=%s&pageSize=10"% \
+        (currency,method,pageIndex)
+        obj = self.__api_call(method, params)
+        #print obj
+        return obj
+        # try:
+
+        # except Exception as ex:
+        #     print(sys.stderr, 'zb %s exception ,'%method,ex)
+        #     return None
 
     def getChargeRecord(self,currency,pageIndex):
         '''
@@ -546,16 +556,17 @@ class Zb_api:
                              'des': 'success',
                              'isSuc': True}}
         '''
-        try:
-            method = sys._getframe().f_code.co_name
-            params = "accesskey="+self.mykey+"&currency=%s&method=%s&pageIndex=%s&pageSize=10"% \
-            (currency,method,pageIndex)
-            obj = self.__api_call(method, params)
-            #print obj
-            return obj
-        except Exception as ex:
-            print(sys.stderr, 'zb %s exception ,'%method,ex)
-            return None
+        method = sys._getframe().f_code.co_name
+        params = "accesskey="+self.mykey+"&currency=%s&method=%s&pageIndex=%s&pageSize=10"% \
+        (currency,method,pageIndex)
+        obj = self.__api_call(method, params)
+        #print obj
+        return obj
+        # try:
+
+        # except Exception as ex:
+        #     print(sys.stderr, 'zb %s exception ,'%method,ex)
+        #     return None
 
     def withdraw(self):
         pass

@@ -122,16 +122,16 @@ class OKCoinSpot:
 
     #现货获得历史订单信息
     def orderHistory(self,symbol,status=0,currentPage=1,pageLength=200):
-            ORDER_HISTORY_RESOURCE = "/api/v1/order_history.do"
-            params = {
-               'api_key':self.__apikey,
-               'symbol':symbol,
-               'status':status,
-               'current_page':currentPage,
-               'page_length':pageLength
-            }
-            params['sign'] = buildMySign(params,self.__secretkey)
-            return httpPost(self.__url,ORDER_HISTORY_RESOURCE,params)
+        ORDER_HISTORY_RESOURCE = "/api/v1/order_history.do"
+        params = {
+           'api_key':self.__apikey,
+           'symbol':symbol,
+           'status':status,
+           'current_page':currentPage,
+           'page_length':pageLength
+        }
+        params['sign'] = buildMySign(params,self.__secretkey)
+        return httpPost(self.__url,ORDER_HISTORY_RESOURCE,params)
 
 
 

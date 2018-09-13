@@ -54,7 +54,7 @@ def get_trade(symbol):
     :param symbol
     :return:
     """
-    params = {'symbol': symbol}
+    params = {'symbol': symbol,'size':60}
 
     url = MARKET_URL + '/market/trade'
     return http_get_request(url, params)
@@ -65,7 +65,7 @@ def get_trades(symbol):
     :param symbol
     :return:
     """
-    params = {'symbol': symbol,'size':1000}
+    params = {'symbol': symbol,'size':60}
     url = MARKET_URL + '/market/history/trade'
     return http_get_request(url, params)
 

@@ -15,3 +15,4 @@ build
 # My configurations:
 db.ini
 /python/w01_exchange/err
+/python/exchange_dj/index/api/err
