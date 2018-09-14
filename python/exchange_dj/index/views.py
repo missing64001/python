@@ -4,6 +4,13 @@ from .api.api import Trade,EXCHANGES
 from threading import Thread
 import time
 
+
+t = 0
+Th = None
+
+
+
+
 # Create your views here.
 def parent_views(request):
     return render(request, '01_parent.html')
@@ -20,11 +27,17 @@ def market_views(request):
     return HttpResponseRedirect('/depth/'+symbol)
 
 def depth_views(request,symbol='btc_usdt'):
+    if not Th:
+        th = Thread(target=test)
+        th.start()
+        global Th
+        Th = th
     '''
         data:
             title:{trades:[price,amout,date,color,type],asks:[price,amout],bids:[price,amout]}
 
     '''
+
     if not request.user.is_authenticated:
         return HttpResponseRedirect('/admin/')
 
@@ -89,4 +102,11 @@ def get_trades(exchange,resdata,symbol):
     trades = [ (trade[3],trade[4],time.strftime("%H:%M:%S", time.localtime(trade[2])),
               '#ae4e54' if trade[5]=='sell' else '#589065' , trade[5]    )    for trade in trades]
     resdata[title].update({'trades':trades})
-    # 
+    #
+
+def test():
+    global t
+    while True:
+        t += 1
+        time.sleep(1)
+        print('test',t)

@@ -7,5 +7,5 @@ urlpatterns = [
     url(r'^market/$', market_views),
     url(r'^$', depth_views),
     url(r'^depth/$', depth_views),
-    url(r'^depth/([_a-zA-Z]+)/$', depth_views),
+    url(r'^depth/([_a-zA-Z0-9]+)/$', depth_views),
 ]

@@ -1,3 +1,5 @@
+
+{%load static%}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -58,7 +60,6 @@
             width: 80px;
         }
 
-
         ul>li>span.s2{
             display: inline-block;
             width: 60px;
@@ -78,6 +79,8 @@
 
 
     </style>
+    <script type="text/javascript" src="{% static 'js/jquery-1.11.3.js'%}"></script>
+    <script type="text/javascript" src="{% static 'js/ajax_h.js'%}"></script>
 </head>
 <body>
 
@@ -129,14 +132,6 @@
         </div>
     {%endfor%}
 
-    <script language="javascript1.2" type="text/javascript">
-    window.onload=function(){
-        var list = document.getElementsByClassName('asks');
 
-        for (var i=0;i<list.length;i++) {
-        list[i].scrollTop = list[i].scrollHeight; 
-        }
-    }
-    </script>
 </body>
 </html>
